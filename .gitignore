@@ -1,0 +1,7 @@
+node_modules/
+out/
+spike/
+teaser/audio/*.wav
+gallery/audio/
+__pycache__/
+.pytest_cache/
