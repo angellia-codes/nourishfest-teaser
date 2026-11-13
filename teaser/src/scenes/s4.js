@@ -49,8 +49,8 @@ function update(u) {
   G.lookFrom(S.cam, [Math.sin(a) * d, M.lerp(0.6, 1.9, M.E.inOutSine(M.prog(u, DROP, END))), Math.cos(a) * d], [0, 0, 0]);   // the arc also climbs
   const k = M.springU(u, DROP, { stiffness: 400, damping: 24 });
   const r = M.springU(u, RISE - 0.6, M.SPRING.gentle);   // title is already up when the panel builds (no overlap)
-  S.title.scale.setScalar(M.lerp(2.2, 1, k) * (1 - 0.2 * r));
-  S.title.position.set(0, r * (P ? 3.2 : 1.9), 6 * (1 - k));
+  S.title.scale.setScalar(M.lerp(1.4, 1, k) * (1 - 0.2 * r));   // ≤ 1.4× on the drop: no full-screen flash
+  S.title.position.set(0, r * (P ? 3.2 : 1.9), 2.5 * (1 - k));
   const ks = M.springU(u, STAMP, { stiffness: 500, damping: 20 });
   S.year.group.visible = u >= STAMP;
   S.year.group.scale.setScalar(M.lerp(1.8, 1, ks));

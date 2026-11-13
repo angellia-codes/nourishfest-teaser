@@ -27,7 +27,7 @@ export function build() {
   const grid = new THREE.GridHelper(80, 40, 0x3a3112, 0x241f0c); grid.position.y = -3.2; scene.add(grid);
   const ready = COPY.ready.map((w) => word3D(w, { face: 'head', size: P ? 1.5 : 1.4, depth: 0.35, bevel: 0.03, front: 'chrome', side: 'gold', neon: 'pinkNeon' }));
   const readyHome = P ? [[0, 2.3], [0, 0], [0, -2.3]] : row(ready, 0.6);
-  const nums = COPY.count.map((n) => word3D(n, { face: 'display', size: 4.2, depth: 1.0, bevel: 0.08, front: 'gold', side: 'chrome', neon: 'pinkNeon', neon2: 'greenNeon' }));
+  const nums = COPY.count.map((n) => word3D(n, { face: 'display', size: P ? 3.2 : 4.2, depth: 1.0, bevel: 0.08, front: 'gold', side: 'chrome', neon: 'pinkNeon', neon2: 'greenNeon' }));
   const invited = (P ? COPY.invitedStack : [COPY.invited]).map((w) => word3D(w, { face: 'head', size: P ? 1.25 : 1.1, depth: 0.3, bevel: 0.03, front: 'chrome', side: 'gold', neon: 'greenNeon' }));
   const invitedHome = P ? [[0, 0.9], [0, -0.9]] : [[0, 0]];
   for (const w of [...ready, ...nums, ...invited]) scene.add(w.group);
@@ -43,15 +43,15 @@ function update(u) {
     const k = M.springU(u, READY[i] - 0.15, M.SPRING.snappy);
     const exit = M.E.inCubic(M.prog(u, COUNT[0] - 0.4, COUNT[0]));
     w.group.visible = u >= READY[i] && u < COUNT[0];
-    w.group.position.set(S.readyHome[i][0], S.readyHome[i][1], -30 * (1 - k) + exit * 20);
+    w.group.position.set(S.readyHome[i][0], S.readyHome[i][1], -30 * (1 - k) + exit * 5);
     w.group.rotation.y = (1 - k) * 0.6;
   });
   S.nums.forEach((n, i) => {
     const end = i < 2 ? COUNT[i + 1] : INVITED;
     const k = M.springU(u, COUNT[i], { stiffness: 420, damping: 34 });
     n.group.visible = u >= COUNT[i] && u < end;
-    n.group.scale.setScalar(M.lerp(2.6, 1, k));
-    n.group.position.set(0, 0, 5 * (1 - k));
+    n.group.scale.setScalar(M.lerp(P ? 1.2 : 1.45, 1, k));   // slam overshoot kept small: a giant gold numeral would be a full-screen colour flash
+    n.group.position.set(0, 0, 1.5 * (1 - k));
     n.group.rotation.z = (i - 1) * -0.06;
   });
   S.invited.forEach((w, i) => {
