@@ -29,23 +29,26 @@ export function build() {
   const P = M.FORMAT.portrait;
   const scene = new THREE.Scene();
   scene.environment = ENV_TEX; scene.background = new THREE.Color(C.black); scene.fog = new THREE.Fog(0x0d0d0d, 14, 32);
-  neonLights(scene, { pink: [-6, 2.5, 3], green: [6, 1.5, -1], gold: [0, 5, 3], k: 0.5 });
+  const lights = neonLights(scene, { pink: [-6, 2.5, 3], green: [6, 1.5, -1], gold: [0, 5, 3], k: 0.5 });
   const tv = crt(); scene.add(tv.group);
   const table = new THREE.Mesh(new THREE.BoxGeometry(7, 0.25, 4.5), MAT.plastic); table.position.set(0, -1.85, -1); scene.add(table);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), MAT.floor); floor.rotation.x = -Math.PI / 2; floor.position.y = -4; scene.add(floor);
   const sh = blobShadow(6, 4.5, 0.7); sh.position.set(0.1, -1.72, -1); scene.add(sh);
+  // standby LED on the TV front: red until POWER, then green; pulses on the beat (frame 0 already has a live detail)
+  const ledMat = new THREE.MeshBasicMaterial({ color: 0xff2a2a, toneMapped: false });
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), ledMat); led.position.set(1.9, -0.95, 0.24); tv.group.add(led);
   const cam = G.camera(P ? 50 : 32);
   scene.add(cam);
   const rm = remote(); cam.add(rm.group);
-  S = { scene, cam, tv, rm };
+  S = { scene, cam, tv, rm, lights, ledMat, base: [lights.pink.intensity, lights.green.intensity] };
   S.gl = { scene, camera: cam, bloom: 0.35, bloomThreshold: 0.9, update: (t, u) => update(u) };
 }
 
 function camPose(u) {
   const P = M.FORMAT.portrait;
-  const z0 = P ? 13 : 13, z1 = P ? 9.5 : 8.6;
+  const z0 = P ? 10.6 : 11.6, z1 = P ? 7.8 : 7.8;
   const p = M.E.inOutSine(M.prog(u, 0, FLY0));
-  const tgt = [SCREEN_CENTER[0], SCREEN_CENTER[1], 0];
+  const tgt = [SCREEN_CENTER[0], SCREEN_CENTER[1] + (P ? 0 : 0.8) * (1 - p), 0];   // look a little high at the start so the antenna stays in shot
   let pos = [M.lerp(0.9, 0.15, p), M.lerp(0.7, 0.25, p), M.lerp(z0, z1, p)];
   if (u >= FLY0) {                                   // log-space dolly to the glass
     const q = M.E.inCubic(M.prog(u, FLY0, CUT));
@@ -105,6 +108,14 @@ function update(u) {
   const P = M.FORMAT.portrait;
   const { pos, tgt } = camPose(u);
   G.lookFrom(S.cam, pos, tgt);
+  // the room's neon breathes on the beat (soft, ≤ ±35%, alternating pink/green: well under the flash limits)
+  const f = u % 1, pk = Math.exp(-f * 4), odd = Math.floor(u) % 2;
+  // the room's neon switches on over the first two beats: pink on beat 1, green on beat 2 (a ramp, not a flash)
+  const onP = 0.3 + 0.7 * M.E.outCubic(M.prog(u, 0.5, 1.0)), onG = 0.3 + 0.7 * M.E.outCubic(M.prog(u, 1.5, 2.0));
+  S.lights.pink.intensity = S.base[0] * onP * (0.85 + 0.5 * (odd ? 0.3 * pk : pk));
+  S.lights.green.intensity = S.base[1] * onG * (0.85 + 0.5 * (odd ? pk : 0.3 * pk));
+  const lp = 0.55 + 0.45 * Math.exp(-(u % 1) * 5);
+  if (u < POWER) S.ledMat.color.setRGB(3 * lp, 0.1 * lp, 0.1 * lp); else S.ledMat.color.setRGB(0.15, 2.6, 0.1);
   S.tv.update(u, { glow: u >= POWER ? M.prog(u, POWER, POWER + 1) : 0 });
   S.tv.screenTex.draw((c, w, h) => drawScreen(c, w, h, u));
   const base = P ? [0.42, -1.12, -2.6] : [0.95, -0.62, -2.4];

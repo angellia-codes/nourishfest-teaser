@@ -55,6 +55,6 @@ export const SAFE = Object.freeze({
 export const MIN_TEXT = Object.freeze({ '16x9': 40, '9x16': 44 });
 // Font sizes (px) for every readable 2-D string. 3-D type is sized in world units per scene.
 export const TYPE = Object.freeze({
-  '16x9': Object.freeze({ infoLabel: 40, infoValue: 68, wa: 60, endWordmark: 200, endYear: 96, endTheme: 44, endInfo: 44, tagline1: 64, tagline2: 42, osd: 40 }),
-  '9x16': Object.freeze({ infoLabel: 44, infoValue: 64, wa: 56, endWordmark: 190, endYear: 110, endTheme: 46, endInfo: 46, tagline1: 64, tagline2: 44, osd: 44 }),
+  '16x9': Object.freeze({ infoLabel: 40, infoValue: 68, wa: 60, endWordmark: 200, endYear: 96, endTheme: 50, endInfo: 52, tagline1: 64, tagline2: 48, osd: 40 }),
+  '9x16': Object.freeze({ infoLabel: 44, infoValue: 64, wa: 56, endWordmark: 190, endYear: 110, endTheme: 52, endInfo: 52, tagline1: 64, tagline2: 50, osd: 44 }),
 });
