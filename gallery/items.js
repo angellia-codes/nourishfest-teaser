@@ -1,4 +1,10 @@
 import { word3D } from '../teaser/sets/type3d.js';
+import { cassette } from '../teaser/sets/cassette.js';
+import { boombox } from '../teaser/sets/boombox.js';
+import { vinyl } from '../teaser/sets/vinyl.js';
+import { headphones } from '../teaser/sets/headphones.js';
+import { memphis } from '../teaser/sets/memphis.js';
+import { sleeve } from '../teaser/sets/sleeve.js';
 import { crt } from '../teaser/sets/crt.js';
 import { remote } from '../teaser/sets/remote.js';
 
@@ -15,4 +21,10 @@ export const ITEMS = () => [
     return { group: tv.group, update: (u) => tv.update(u, { glow: 1 }) };
   })(),
   (() => { const r = remote(); r.group.rotation.x = 0.5; return { group: r.group, update: (u) => r.update(u, { power: 1, led: 1 }) }; })(),
+  cassette(),
+  boombox(),
+  (() => { const v = vinyl(); v.group.rotation.x = 0.45; return v; })(),
+  headphones(),
+  memphis(),
+  sleeve(),
 ];
